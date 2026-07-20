@@ -14,17 +14,29 @@ QLabel#assistantTitle {
 }
 
 QLabel#clock {
-    font-size: 28px;
+    font-size: 20px;
 }
 
 QLabel#status {
-    font-size: 18px;
+    font-size: 16px;
     color: #62d8ff;
-    padding: 18px;
+    padding: 8px;
 }
 
 QLabel#systemStatus {
+    font-size: 13px;
+    color: #83cce5;
+}
+
+QTextBrowser#conversation {
+    color: #d9f7ff;
+    background: #07111b;
+    border: 1px solid #1f536c;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: "Segoe UI";
     font-size: 14px;
+    selection-background-color: #1b6f91;
 }
 
 QLineEdit#commandInput {
@@ -53,4 +65,21 @@ QPushButton {
 
 QPushButton:hover {
     background: #123b54;
+}
+
+QScrollBar:vertical {
+    background: #07111b;
+    width: 10px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background: #28627d;
+    border-radius: 5px;
+    min-height: 24px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
 }
