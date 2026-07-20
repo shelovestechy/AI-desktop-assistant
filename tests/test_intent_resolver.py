@@ -28,6 +28,16 @@ def test_resolves_windows_security_request() -> None:
     assert result.command == "open windows security"
 
 
+def test_resolves_help_request() -> None:
+    result = IntentResolver().resolve(
+        "Jarvis, what can you do?",
+        wake_word="jarvis",
+    )
+
+    assert result is not None
+    assert result.command == "help"
+
+
 def test_does_not_guess_unknown_action() -> None:
     result = IntentResolver().resolve("Delete all my files")
 
