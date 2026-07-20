@@ -1,0 +1,41 @@
+QMainWindow {
+    background: #050a12;
+}
+
+QLabel {
+    color: #bdefff;
+    font-family: "Segoe UI";
+}
+
+QLabel#assistantTitle {
+    font-size: 42px;
+    font-weight: 600;
+    letter-spacing: 8px;
+}
+
+QLabel#clock {
+    font-size: 28px;
+}
+
+QLabel#status {
+    font-size: 18px;
+    color: #62d8ff;
+    padding: 18px;
+}
+
+QLabel#systemStatus {
+    font-size: 14px;
+}
+
+QPushButton {
+    color: #bdefff;
+    background: #0c2638;
+    border: 1px solid #62d8ff;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+}
+
+QPushButton:hover {
+    background: #123b54;
+}
