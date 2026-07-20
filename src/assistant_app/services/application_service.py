@@ -5,6 +5,7 @@ import subprocess
 import webbrowser
 from dataclasses import dataclass
 
+from assistant_app.core.capabilities import format_capabilities
 from assistant_app.core.command_router import CommandResult
 from assistant_app.services.system_service import SystemService
 
@@ -51,6 +52,9 @@ class ApplicationService:
             f"CPU usage is {snapshot.cpu_percent:.0f} percent and memory usage is "
             f"{snapshot.memory_percent:.0f} percent.",
         )
+
+    def show_help(self) -> CommandResult:
+        return CommandResult(True, format_capabilities())
 
     def close_assistant(self) -> CommandResult:
         return CommandResult(True, "Shutting down.", should_close=True)
