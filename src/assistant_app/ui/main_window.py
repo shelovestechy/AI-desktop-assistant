@@ -3,22 +3,37 @@ from __future__ import annotations
 from datetime import datetime
 
 from PyQt6.QtCore import QTimer, Qt
-from PyQt6.QtWidgets import QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (
+    QApplication,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
+from assistant_app.core.command_router import CommandRouter
 from assistant_app.core.config import Persona
 from assistant_app.core.state import AssistantState
 from assistant_app.services.system_service import SystemService
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, persona: Persona, system_service: SystemService) -> None:
+    def __init__(
+        self,
+        persona: Persona,
+        system_service: SystemService,
+        command_router: CommandRouter,
+    ) -> None:
         super().__init__()
         self.persona = persona
         self.system_service = system_service
+        self.command_router = command_router
         self.state = AssistantState.STANDBY
 
         self.setWindowTitle(persona.assistant_name)
-        self.setMinimumSize(760, 520)
+        self.setMinimumSize(760, 560)
 
         self.title_label = QLabel(persona.assistant_name.upper())
         self.title_label.setObjectName("assistantTitle")
@@ -36,15 +51,29 @@ class MainWindow(QMainWindow):
         self.system_label.setObjectName("systemStatus")
         self.system_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.command_input = QLineEdit()
+        self.command_input.setObjectName("commandInput")
+        self.command_input.setPlaceholderText(
+            f'Type a command, for example: "{persona.wake_word}, open Spotify"'
+        )
+        self.command_input.setClearButtonEnabled(True)
+        self.command_input.returnPressed.connect(self.submit_command)
+
+        self.command_button = QPushButton("RUN COMMAND")
+        self.command_button.clicked.connect(self.submit_command)
+
         self.activate_button = QPushButton("ACTIVATE")
         self.activate_button.clicked.connect(self.activate)
 
         layout = QVBoxLayout()
+        layout.setSpacing(14)
         layout.addStretch()
         layout.addWidget(self.title_label)
         layout.addWidget(self.clock_label)
         layout.addWidget(self.status_label)
         layout.addWidget(self.system_label)
+        layout.addWidget(self.command_input)
+        layout.addWidget(self.command_button)
         layout.addWidget(self.activate_button)
         layout.addStretch()
 
@@ -77,4 +106,36 @@ class MainWindow(QMainWindow):
     def activate(self) -> None:
         phrase = self.persona.phrases.get("wake_response", "I'm listening.")
         self.set_state(AssistantState.LISTENING, phrase)
-        QTimer.singleShot(2500, lambda: self.set_state(AssistantState.STANDBY))
+        self.command_input.setFocus()
+        QTimer.singleShot(2500, self._return_to_standby_if_listening)
+
+    def submit_command(self) -> None:
+        command = self.command_input.text().strip()
+        if not command:
+            self.set_state(AssistantState.LISTENING, "Please enter a command.")
+            self.command_input.setFocus()
+            return
+
+        self.command_input.clear()
+        self.set_state(AssistantState.PROCESSING, command)
+        result = self.command_router.dispatch(command, wake_word=self.persona.wake_word)
+
+        if result.success:
+            self.set_state(AssistantState.SPEAKING, result.message)
+        else:
+            self.set_state(AssistantState.ERROR, result.message)
+
+        if result.should_close:
+            QTimer.singleShot(900, self._quit_application)
+        else:
+            QTimer.singleShot(3000, lambda: self.set_state(AssistantState.STANDBY))
+
+    def _return_to_standby_if_listening(self) -> None:
+        if self.state is AssistantState.LISTENING:
+            self.set_state(AssistantState.STANDBY)
+
+    @staticmethod
+    def _quit_application() -> None:
+        application = QApplication.instance()
+        if application is not None:
+            application.quit()
