@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Callable
 
@@ -55,4 +56,6 @@ class CommandRouter:
 
     @staticmethod
     def normalize(text: str) -> str:
-        return " ".join(text.casefold().strip().rstrip(".!?").split())
+        normalized = text.casefold().strip()
+        normalized = re.sub(r"[^\w\s-]", " ", normalized)
+        return " ".join(normalized.split())
