@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 )
 
 from assistant_app.core.assistant_controller import AssistantController
+from assistant_app.core.capabilities import compact_capability_examples
 from assistant_app.core.config import Persona
 from assistant_app.core.state import AssistantState
 from assistant_app.services.system_service import SystemService
@@ -54,6 +55,11 @@ class MainWindow(QMainWindow):
         self.system_label.setObjectName("systemStatus")
         self.system_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.capabilities_label = QLabel(f"TRY  {compact_capability_examples()}")
+        self.capabilities_label.setObjectName("capabilities")
+        self.capabilities_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.capabilities_label.setWordWrap(True)
+
         self.conversation = QTextBrowser()
         self.conversation.setObjectName("conversation")
         self.conversation.setOpenExternalLinks(False)
@@ -84,6 +90,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.clock_label)
         layout.addWidget(self.status_label)
         layout.addWidget(self.system_label)
+        layout.addWidget(self.capabilities_label)
         layout.addWidget(self.conversation, 1)
         layout.addLayout(input_layout)
         layout.addWidget(self.activate_button)
@@ -155,10 +162,11 @@ class MainWindow(QMainWindow):
         self._append_message(self.persona.assistant_name.upper(), message, css_class)
 
     def _append_message(self, sender: str, message: str, css_class: str) -> None:
+        safe_message = escape(message).replace("\n", "<br>")
         self.conversation.append(
             f'<div class="message {css_class}">'
             f'<span class="sender">{escape(sender)}</span><br>'
-            f'<span>{escape(message)}</span></div><br>'
+            f"<span>{safe_message}</span></div><br>"
         )
         scrollbar = self.conversation.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
