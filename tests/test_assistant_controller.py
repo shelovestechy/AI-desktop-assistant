@@ -14,6 +14,10 @@ def build_controller() -> AssistantController:
     )
     router = CommandRouter()
     router.register(["status"], lambda: CommandResult(True, "All systems nominal."))
+    router.register(
+        ["open spotify"],
+        lambda: CommandResult(True, "Opening Spotify."),
+    )
     return AssistantController(persona=persona, command_router=router)
 
 
@@ -26,6 +30,13 @@ def test_processes_command_through_router() -> None:
 
     assert result.success is True
     assert result.message == "All systems nominal."
+
+
+def test_processes_natural_language_through_intent_resolver() -> None:
+    result = build_controller().process("Jarvis, could you launch Spotify please?")
+
+    assert result.success is True
+    assert result.message == "Opening Spotify."
 
 
 def test_rejects_empty_input() -> None:
