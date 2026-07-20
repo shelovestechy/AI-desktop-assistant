@@ -24,6 +24,10 @@ def build_command_router(application_service: ApplicationService) -> CommandRout
         application_service.show_system_status,
     )
     router.register(
+        ["help", "show commands", "what can you do", "available commands"],
+        application_service.show_help,
+    )
+    router.register(
         ["close assistant", "close jarvis", "shut down assistant"],
         application_service.close_assistant,
     )
