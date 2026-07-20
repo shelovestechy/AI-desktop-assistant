@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 from datetime import datetime
+from html import escape
 
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtWidgets import (
     QApplication,
+    QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
     QPushButton,
+    QTextBrowser,
     QVBoxLayout,
     QWidget,
 )
 
-from assistant_app.core.command_router import CommandRouter
+from assistant_app.core.assistant_controller import AssistantController
 from assistant_app.core.config import Persona
 from assistant_app.core.state import AssistantState
 from assistant_app.services.system_service import SystemService
@@ -24,16 +27,16 @@ class MainWindow(QMainWindow):
         self,
         persona: Persona,
         system_service: SystemService,
-        command_router: CommandRouter,
+        controller: AssistantController,
     ) -> None:
         super().__init__()
         self.persona = persona
         self.system_service = system_service
-        self.command_router = command_router
+        self.controller = controller
         self.state = AssistantState.STANDBY
 
         self.setWindowTitle(persona.assistant_name)
-        self.setMinimumSize(760, 560)
+        self.setMinimumSize(820, 680)
 
         self.title_label = QLabel(persona.assistant_name.upper())
         self.title_label.setObjectName("assistantTitle")
@@ -51,6 +54,10 @@ class MainWindow(QMainWindow):
         self.system_label.setObjectName("systemStatus")
         self.system_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.conversation = QTextBrowser()
+        self.conversation.setObjectName("conversation")
+        self.conversation.setOpenExternalLinks(False)
+
         self.command_input = QLineEdit()
         self.command_input.setObjectName("commandInput")
         self.command_input.setPlaceholderText(
@@ -59,23 +66,27 @@ class MainWindow(QMainWindow):
         self.command_input.setClearButtonEnabled(True)
         self.command_input.returnPressed.connect(self.submit_command)
 
-        self.command_button = QPushButton("RUN COMMAND")
+        self.command_button = QPushButton("SEND")
         self.command_button.clicked.connect(self.submit_command)
 
         self.activate_button = QPushButton("ACTIVATE")
         self.activate_button.clicked.connect(self.activate)
 
+        input_layout = QHBoxLayout()
+        input_layout.setSpacing(10)
+        input_layout.addWidget(self.command_input, 1)
+        input_layout.addWidget(self.command_button)
+
         layout = QVBoxLayout()
-        layout.setSpacing(14)
-        layout.addStretch()
+        layout.setContentsMargins(28, 22, 28, 24)
+        layout.setSpacing(12)
         layout.addWidget(self.title_label)
         layout.addWidget(self.clock_label)
         layout.addWidget(self.status_label)
         layout.addWidget(self.system_label)
-        layout.addWidget(self.command_input)
-        layout.addWidget(self.command_button)
+        layout.addWidget(self.conversation, 1)
+        layout.addLayout(input_layout)
         layout.addWidget(self.activate_button)
-        layout.addStretch()
 
         container = QWidget()
         container.setLayout(layout)
@@ -86,6 +97,8 @@ class MainWindow(QMainWindow):
         self.timer.start(1000)
         self.refresh_dashboard()
         self.set_state(AssistantState.STANDBY)
+        self.append_assistant_message(self.controller.greeting())
+        self.command_input.setFocus()
 
     def set_state(self, state: AssistantState, detail: str | None = None) -> None:
         self.state = state
@@ -97,7 +110,7 @@ class MainWindow(QMainWindow):
 
     def refresh_dashboard(self) -> None:
         now = datetime.now()
-        self.clock_label.setText(now.strftime("%H:%M:%S\n%A, %d %B %Y"))
+        self.clock_label.setText(now.strftime("%H:%M:%S   |   %A, %d %B %Y"))
         snapshot = self.system_service.snapshot()
         self.system_label.setText(
             f"CPU {snapshot.cpu_percent:.0f}%   |   MEMORY {snapshot.memory_percent:.0f}%"
@@ -106,6 +119,7 @@ class MainWindow(QMainWindow):
     def activate(self) -> None:
         phrase = self.persona.phrases.get("wake_response", "I'm listening.")
         self.set_state(AssistantState.LISTENING, phrase)
+        self.append_assistant_message(phrase)
         self.command_input.setFocus()
         QTimer.singleShot(2500, self._return_to_standby_if_listening)
 
@@ -117,8 +131,10 @@ class MainWindow(QMainWindow):
             return
 
         self.command_input.clear()
-        self.set_state(AssistantState.PROCESSING, command)
-        result = self.command_router.dispatch(command, wake_word=self.persona.wake_word)
+        self.append_user_message(command)
+        self.set_state(AssistantState.PROCESSING)
+        result = self.controller.process(command)
+        self.append_assistant_message(result.message, is_error=not result.success)
 
         if result.success:
             self.set_state(AssistantState.SPEAKING, result.message)
@@ -128,7 +144,24 @@ class MainWindow(QMainWindow):
         if result.should_close:
             QTimer.singleShot(900, self._quit_application)
         else:
-            QTimer.singleShot(3000, lambda: self.set_state(AssistantState.STANDBY))
+            QTimer.singleShot(2200, lambda: self.set_state(AssistantState.STANDBY))
+            self.command_input.setFocus()
+
+    def append_user_message(self, message: str) -> None:
+        self._append_message("YOU", message, "userMessage")
+
+    def append_assistant_message(self, message: str, is_error: bool = False) -> None:
+        css_class = "errorMessage" if is_error else "assistantMessage"
+        self._append_message(self.persona.assistant_name.upper(), message, css_class)
+
+    def _append_message(self, sender: str, message: str, css_class: str) -> None:
+        self.conversation.append(
+            f'<div class="message {css_class}">'
+            f'<span class="sender">{escape(sender)}</span><br>'
+            f'<span>{escape(message)}</span></div><br>'
+        )
+        scrollbar = self.conversation.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
 
     def _return_to_standby_if_listening(self) -> None:
         if self.state is AssistantState.LISTENING:
