@@ -37,6 +37,17 @@ class IntentResolver:
 
         words = set(normalized.split())
 
+        if normalized in {
+            "help",
+            "commands",
+            "show commands",
+            "available commands",
+            "what can you do",
+            "what are your capabilities",
+            "show me what you can do",
+        }:
+            return IntentMatch("help", 0.98)
+
         if self._contains_target(normalized, ("spotify", "music")) and words.intersection(
             {"open", "launch", "start", "play", "put"}
         ):
