@@ -15,17 +15,47 @@ The first private build uses a configurable **Jarvis** persona as a personal gif
 - Clear microphone status whenever wake-word detection is enabled
 - Useful notifications, minimal interruption
 
-## First milestone
+## Current milestone
 
-Create a Windows desktop application that:
+The application now:
 
 1. Loads assistant identity and theme from configuration.
-2. Displays a PyQt6 dashboard with time and system status.
-3. Supports activation by keyboard shortcut.
-4. Optionally supports a locally detected wake word.
-5. Routes a small allowlisted set of commands.
-6. Opens ChatGPT, Spotify and Windows Security.
-7. Keeps an audit trail without storing message or email contents.
+2. Displays a PyQt6 dashboard with time, CPU and memory usage.
+3. Accepts typed commands with or without the configured wake word.
+4. Routes commands through an explicit allowlist.
+5. Opens ChatGPT, Spotify and Windows Security.
+6. Reports basic system status.
+7. Rejects unknown commands instead of executing arbitrary input.
+8. Runs automated command-router tests in GitHub Actions.
+
+Current commands include:
+
+- `Jarvis, open ChatGPT`
+- `Jarvis, open Spotify`
+- `Jarvis, open Windows Security`
+- `Jarvis, show system status`
+- `Jarvis, close assistant`
+
+## Local development
+
+```powershell
+git clone https://github.com/shelovestechy/AI-desktop-assistant.git
+cd AI-desktop-assistant
+
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+
+ai-desktop-assistant
+```
+
+Run tests with:
+
+```powershell
+pytest -q
+```
 
 ## Planned modules
 
