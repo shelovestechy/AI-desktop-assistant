@@ -5,10 +5,10 @@ from assistant_app.core.config import Persona
 
 def build_controller() -> AssistantController:
     persona = Persona(
-        assistant_name="Jarvis",
-        wake_word="jarvis",
+        assistant_name="Aava",
+        wake_word="aava",
         user_title="sir",
-        theme="jarvis",
+        theme="default",
         language="en",
         phrases={"greeting": "Systems online."},
     )
@@ -26,14 +26,14 @@ def test_returns_configured_greeting() -> None:
 
 
 def test_processes_command_through_router() -> None:
-    result = build_controller().process("Jarvis, status!")
+    result = build_controller().process("Aava, status!")
 
     assert result.success is True
     assert result.message == "All systems nominal."
 
 
 def test_processes_natural_language_through_intent_resolver() -> None:
-    result = build_controller().process("Jarvis, could you launch Spotify please?")
+    result = build_controller().process("Aava, could you launch Spotify please?")
 
     assert result.success is True
     assert result.message == "Opening Spotify."

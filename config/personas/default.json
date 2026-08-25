@@ -1,0 +1,13 @@
+{
+  "assistant_name": "Aava",
+  "wake_word": "aava",
+  "user_title": "",
+  "language": "en",
+  "theme": "default",
+  "phrases": {
+    "startup": "Starting local services.",
+    "ready": "Ready.",
+    "wake_response": "I'm listening.",
+    "error": "I was unable to complete that request safely."
+  }
+}

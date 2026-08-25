@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from html import escape
 
-from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -112,11 +112,13 @@ class MainWindow(QMainWindow):
         text = state.value if not detail else f"{state.value} — {detail}"
         self.status_label.setText(text)
         self.status_label.setProperty("assistantState", state.value.lower())
-        self.status_label.style().unpolish(self.status_label)
-        self.status_label.style().polish(self.status_label)
+        style = self.status_label.style()
+        if style is not None:
+            style.unpolish(self.status_label)
+            style.polish(self.status_label)
 
     def refresh_dashboard(self) -> None:
-        now = datetime.now()
+        now = datetime.now(tz=UTC).astimezone()
         self.clock_label.setText(now.strftime("%H:%M:%S   |   %A, %d %B %Y"))
         snapshot = self.system_service.snapshot()
         self.system_label.setText(
@@ -169,7 +171,8 @@ class MainWindow(QMainWindow):
             f"<span>{safe_message}</span></div><br>"
         )
         scrollbar = self.conversation.verticalScrollBar()
-        scrollbar.setValue(scrollbar.maximum())
+        if scrollbar is not None:
+            scrollbar.setValue(scrollbar.maximum())
 
     def _return_to_standby_if_listening(self) -> None:
         if self.state is AssistantState.LISTENING:

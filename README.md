@@ -1,42 +1,64 @@
 # AI Desktop Assistant
 
-A privacy-first AI desktop assistant for Windows.
+A small Windows desktop assistant I am building while learning Python, application structure and security-minded automation.
 
-The first private build uses a configurable **Jarvis** persona as a personal gift. The application core must remain brand-neutral so the assistant name, wake word, voice, phrases, commands and visual theme can later be replaced without rewriting the engine.
+The name says AI, but the current version does not use a language model yet. It uses local and deterministic intent matching. In other words, it only does things I have explicitly allowed it to do. This is less magical, but also less likely to decide that `delete everything` sounds like a reasonable afternoon task.
 
-## Product principles
+## What works now
 
-- Privacy by default
-- Local processing when practical
-- Cloud services only when explicitly enabled
-- Least-privilege integrations
-- No arbitrary command or script execution
-- User confirmation before state-changing or security-sensitive actions
-- Clear microphone status whenever wake-word detection is enabled
-- Useful notifications, minimal interruption
+- PyQt6 desktop interface
+- typed commands with an optional wake word
+- local matching for a few natural-language requests
+- an explicit allowlist of available actions
+- links to ChatGPT and Spotify
+- Windows Security launcher
+- read-only CPU and memory status
+- configurable assistant name and visual theme
+- automated tests on Windows with GitHub Actions
 
-## Current milestone
+The application rejects unknown commands. It does not pass user input to PowerShell, Command Prompt or another shell.
 
-The application now:
+## Why I am building this
 
-1. Loads assistant identity and theme from configuration.
-2. Displays a PyQt6 dashboard with time, CPU and memory usage.
-3. Accepts typed commands with or without the configured wake word.
-4. Routes commands through an explicit allowlist.
-5. Opens ChatGPT, Spotify and Windows Security.
-6. Reports basic system status.
-7. Rejects unknown commands instead of executing arbitrary input.
-8. Runs automated command-router tests in GitHub Actions.
+I work in Service Desk and I am interested in what happens when a helpful tool is also allowed to interact with a computer.
 
-Current commands include:
+The interesting part is not only making a button work. I also want to understand:
 
-- `Jarvis, open ChatGPT`
-- `Jarvis, open Spotify`
-- `Jarvis, open Windows Security`
-- `Jarvis, show system status`
-- `Jarvis, close assistant`
+- which actions should be allowed
+- where user confirmation is needed
+- how to keep the user interface separate from command logic
+- what should stay local
+- how failures should be handled without running something unexpected
 
-## Local development
+This is not a finished assistant. It is a working learning project with a deliberately small set of features.
+
+## Safety rules in the current build
+
+1. Commands must be registered before they can run.
+2. Natural-language matching can only return an existing registered command.
+3. Unknown requests are rejected.
+4. System information is read-only.
+5. External programs are opened through fixed destinations, not arbitrary user input.
+6. Cloud integrations are not enabled by default.
+
+More detail is available in [SECURITY.md](./SECURITY.md).
+
+## Project structure
+
+```text
+src/assistant_app/
+├── core/       command routing, intent matching and configuration
+├── services/   approved application and system actions
+└── ui/         PyQt6 desktop interface
+
+config/personas/  public example persona
+themes/           visual theme
+tests/            command, intent and controller tests
+```
+
+## Run locally
+
+The project requires Windows and Python 3.12 or newer.
 
 ```powershell
 git clone https://github.com/shelovestechy/AI-desktop-assistant.git
@@ -44,36 +66,34 @@ cd AI-desktop-assistant
 
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-
 python -m pip install --upgrade pip
 pip install -e ".[dev]"
 
 ai-desktop-assistant
 ```
 
-Run tests with:
+Run the checks:
 
 ```powershell
 pytest -q
+ruff check .
+mypy src
 ```
 
-## Planned modules
+## Current limitations
 
-- Desktop HUD and settings
-- Voice activation, speech-to-text and text-to-speech
-- ChatGPT application handoff
-- Read-only email summaries
-- Weather and rain alerts
-- Configurable news sources, topics and keywords
-- Spotify playlists linked to user-defined modes
-- Calendar and reminders
-- Microsoft Defender and Windows security status
-- Local preferences and approved learning
+- commands are typed; voice input is not implemented
+- intent matching is rule-based and intentionally small
+- there is no email, calendar or account integration
+- there is no installer yet
+- the interface is still an early desktop prototype
 
-## Branding and assets
+## Next things I want to learn
 
-No Marvel, Iron Man, movie audio, logos, fonts or copied HUD assets are included. The gift edition may be called Jarvis privately, but all graphics, sounds and code are created independently or used under a verified compatible license.
+- confirmation before any future state-changing action
+- a small local audit log without storing unnecessary personal data
+- clearer permission settings for integrations
+- voice input with a visible microphone state
+- packaging the application for Windows
 
-## Status
-
-Early development. Private repository.
+I would rather add these slowly than build a very impressive security incident generator.

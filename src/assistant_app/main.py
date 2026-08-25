@@ -14,7 +14,7 @@ from assistant_app.ui.main_window import MainWindow
 
 def main() -> None:
     config = ConfigManager()
-    persona = config.load_persona("jarvis")
+    persona = config.load_persona("default")
     system_service = SystemService()
     application_service = ApplicationService(system_service=system_service)
     command_router = build_command_router(application_service)

@@ -3,8 +3,8 @@ from assistant_app.core.intent_resolver import IntentResolver
 
 def test_resolves_polite_spotify_request() -> None:
     result = IntentResolver().resolve(
-        "Jarvis, could you launch Spotify please?",
-        wake_word="jarvis",
+        "Aava, could you launch Spotify please?",
+        wake_word="aava",
     )
 
     assert result is not None
@@ -14,7 +14,7 @@ def test_resolves_polite_spotify_request() -> None:
 def test_resolves_natural_system_status_request() -> None:
     result = IntentResolver().resolve(
         "Can you show me the computer status?",
-        wake_word="jarvis",
+        wake_word="aava",
     )
 
     assert result is not None
@@ -30,8 +30,8 @@ def test_resolves_windows_security_request() -> None:
 
 def test_resolves_help_request() -> None:
     result = IntentResolver().resolve(
-        "Jarvis, what can you do?",
-        wake_word="jarvis",
+        "Aava, what can you do?",
+        wake_word="aava",
     )
 
     assert result is not None

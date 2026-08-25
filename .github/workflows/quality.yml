@@ -30,5 +30,11 @@ jobs:
       - name: Compile source
         run: python -m compileall -q src
 
+      - name: Check formatting and common mistakes
+        run: ruff check .
+
+      - name: Check types
+        run: mypy src
+
       - name: Run tests
         run: pytest -q

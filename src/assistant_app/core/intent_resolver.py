@@ -70,7 +70,7 @@ class IntentResolver:
         ):
             return IntentMatch("show system status", 0.9)
 
-        if self._contains_target(normalized, ("assistant", "jarvis", "application", "app")) and words.intersection(
+        if self._contains_target(normalized, ("assistant", "application", "app")) and words.intersection(
             {"close", "exit", "quit", "shutdown", "stop"}
         ):
             return IntentMatch("close assistant", 0.95)

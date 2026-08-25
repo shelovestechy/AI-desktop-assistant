@@ -1,30 +1,68 @@
 QMainWindow {
-    background: #15171a;
+    background: #111827;
 }
 
 QLabel {
-    color: #f3f4f6;
+    color: #e5e7eb;
     font-family: "Segoe UI";
 }
 
 QLabel#assistantTitle {
-    font-size: 38px;
+    color: #93c5fd;
+    font-size: 40px;
     font-weight: 600;
+    letter-spacing: 6px;
 }
 
 QLabel#clock {
-    font-size: 26px;
+    font-size: 20px;
 }
 
 QLabel#status {
-    font-size: 17px;
-    padding: 18px;
+    color: #7dd3fc;
+    font-size: 16px;
+    padding: 8px;
+}
+
+QLabel#systemStatus,
+QLabel#capabilities {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+QTextBrowser#conversation {
+    color: #e5e7eb;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: "Segoe UI";
+    font-size: 14px;
+}
+
+QLineEdit#commandInput {
+    color: #e5e7eb;
+    background: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: "Segoe UI";
+    font-size: 14px;
+}
+
+QLineEdit#commandInput:focus {
+    border: 1px solid #7dd3fc;
 }
 
 QPushButton {
-    color: #f3f4f6;
-    background: #282c31;
-    border: 1px solid #737983;
+    color: #e5e7eb;
+    background: #1e3a5f;
+    border: 1px solid #60a5fa;
     border-radius: 8px;
     padding: 12px 24px;
+    font-size: 14px;
+}
+
+QPushButton:hover {
+    background: #254b77;
 }

@@ -23,7 +23,7 @@ class ApplicationService:
     def open_spotify(self) -> CommandResult:
         if os.name == "nt":
             try:
-                os.startfile("spotify:")  # type: ignore[attr-defined]
+                os.startfile("spotify:")
                 return CommandResult(True, "Opening Spotify.")
             except OSError:
                 pass

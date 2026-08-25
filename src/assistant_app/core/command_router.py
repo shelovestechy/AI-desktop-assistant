@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 
 @dataclass(frozen=True)
@@ -48,7 +48,7 @@ class CommandRouter:
 
         try:
             return handler()
-        except Exception:
+        except Exception:  # noqa: BLE001 - handlers end at this safety boundary.
             return CommandResult(
                 success=False,
                 message="I was unable to complete that request safely.",

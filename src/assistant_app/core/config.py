@@ -18,7 +18,7 @@ class Persona:
     phrases: dict[str, str]
 
     @classmethod
-    def fallback(cls) -> "Persona":
+    def fallback(cls) -> Persona:
         return cls(
             assistant_name="Assistant",
             wake_word="assistant",
@@ -35,7 +35,7 @@ class ConfigManager:
     def __init__(self, project_root: Path = PROJECT_ROOT) -> None:
         self.project_root = project_root
 
-    def load_persona(self, persona_name: str = "jarvis") -> Persona:
+    def load_persona(self, persona_name: str = "default") -> Persona:
         path = self.project_root / "config" / "personas" / f"{persona_name}.json"
         try:
             raw: Any = json.loads(path.read_text(encoding="utf-8"))

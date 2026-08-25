@@ -5,7 +5,7 @@ def test_dispatches_registered_command() -> None:
     router = CommandRouter()
     router.register(["open dashboard"], lambda: CommandResult(True, "Opened."))
 
-    result = router.dispatch("Jarvis, open dashboard!", wake_word="jarvis")
+    result = router.dispatch("Aava, open dashboard!", wake_word="aava")
 
     assert result.success is True
     assert result.message == "Opened."
