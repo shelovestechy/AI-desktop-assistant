@@ -20,7 +20,7 @@ The application rejects unknown commands. It does not pass user input to PowerSh
 
 ## Why I am building this
 
-I work in Service Desk and I am interested in what happens when a helpful tool is also allowed to interact with a computer.
+I am interested in what happens when a helpful tool is also allowed to interact with a computer. (Also I am huge Marvel fan and who doesn't want their own little J.A.R.V.I.S. ?)
 
 The interesting part is not only making a button work. I also want to understand:
 
